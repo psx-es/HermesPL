@@ -389,6 +389,65 @@ sys8_open_table:
 		system_call_1(8, 10, mode)
 */
 sys8_config:
+	cmplwi	%r3, 0
+	beq		sys8_config_retailxml
+	cmplwi	%r3, 1
+	beq		sys8_config_debugxml
+	cmplwi	%r3, 2
+	beq		sys8_config_freeredirect
+	cmplwi	%r3, 3
+	beq		sys8_config_unpatchsfo
+	cmplwi	%r3, 4
+	beq		sys8_config_patchsfo
+
+	b syscall8_unsupported
+
+sys8_config_retailxml:
+	b syscall8_unsupported
+sys8_config_debugxml:
+	b syscall8_unsupported
+sys8_config_freeredirect:
+//	b syscall8_unsupported
+    mflr    %r0
+	stdu    %sp, -0xA0(%sp)
+	std     %r0, 0xB0(%sp)
+    std      %r27, 0x78(%sp)
+    std      %r31, 0x98(%sp)
+
+    MEM_BASE(%r31)
+
+	// free device memory
+    LOAD_LABEL2(%r27, %r31, buffer)
+	ld      %r3, 0(%r27)
+	cmpldi   %r3, 0
+	beq     sys8_config_freeredirect2
+	li      %r4, 0x27
+	bl      ABS(free)
+
+    li      %r3, 0
+    std     %r3, 0(%r27)
+    std     %r3, 8(%r27)
+sys8_config_freeredirect2:
+    LOAD_LABEL2(%r27, %r31, buffer2)
+	ld	    %r3, 0x0(%r27)
+    cmpldi   %r3, 0
+	beq     sys8_config_freeredirect3
+	li      %r4, 0x27
+	bl      ABS(free)
+    li      %r3, 0
+    std     %r3, 0(%r27)
+sys8_config_freeredirect3:
+    LOAD_LABEL2(%r27, %r31, str_open_cmp)
+    std     %r3, 0(%r27)
+    ld      %r27, 0x78(%sp)
+    ld      %r31, 0x98(%sp)
+    ld	    %r0, 0xB0(%sp)
+    addi    %sp, %sp, 0xA0
+	mtlr    %r0
+	blr    
+sys8_config_unpatchsfo:
+	b syscall8_unsupported
+sys8_config_patchsfo:
 	b syscall8_unsupported
 
 /**
@@ -443,6 +502,7 @@ app_home:
 */
 buffer:
 	.quad 0
+buffer2:
 	.quad 0
 str_open_cmp:
 	.quad 0
