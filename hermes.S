@@ -344,7 +344,7 @@ sys8_panic:
 	sc		1
 
 /**
-	Syscall 8 Perm Mode
+	Syscall 8 Perm Mode -> NOT WORKING
 		system_call_2(8, 8, perm)
 */
 sys8_perm_mode:

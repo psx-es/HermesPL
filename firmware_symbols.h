@@ -20,7 +20,7 @@
 
 #elif defined(FW_341)
 
-	#define BASE						0xef48
+	#define BASE						0x50b3c
 
 	#define strncmp						0x4d344
 	#define strcpy						0x4d2f0
