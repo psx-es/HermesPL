@@ -288,24 +288,31 @@ syscall8_bl:
 */
 sys8_disable:
 	LOAD_LABEL2(%r27, %r31, save_syscall_values)
-	std		%r3,  8(%r27) // save key
 
+	//Save key.
+	std		%r3,  8(%r27)
 	li		%r28, 1
-	stw		%r28, 0(%r27) // stealth mode
+
+	//Stealth mode.
+	stw		%r28, 0(%r27)
 
 	LOAD_ABS(%r4, %r31, syscall_table)
 
-	ld		%r3, 37*8(%r4) // get unused syscall addr
+	//Get "not implemented" Syscall addr.
+	ld		%r3, 37*8(%r4)
 
+	//Patch Syscall 6 to not implemented saving its addr.
 	ld		%r28, 6*8(%r4)
-	std		%r3,  6*8(%r4) // patch syscall 6 to stealth
+	std		%r3,  6*8(%r4)
 	std		%r28,  16(%r27)
 
+	//Patch Syscall 7 to not implemented saving its addr.
 	ld		%r28, 7*8(%r4)
-	std		%r3,  7*8(%r4) // patch syscall 7 to stealth
+	std		%r3,  7*8(%r4)
 	std		%r28,  24(%r27)
 
-	std		%r3, 36*8(%r4) // patch syscall 36 to stealth
+	//Patch Syscall 36 to not implemented.
+	std		%r3, 36*8(%r4)
 
 	li		%r3, 0
 	blr
@@ -364,7 +371,7 @@ sys8_panic:
 	li		%r3, 0
 	li		%r11, 0xFF
 	sc		1
-	blr
+//	blr
 
 /**
 	Syscall 8 Perm Mode -> NOT WORKING
@@ -385,7 +392,7 @@ sys8_open_table:
 	blr
 
 /**
-	Syscall 8 Config -> NOT WORKING
+	Syscall 8 Config -> HALF WORKING
 		system_call_1(8, 10, mode)
 */
 sys8_config:
@@ -399,55 +406,50 @@ sys8_config:
 	beq		sys8_config_unpatchsfo
 	cmplwi	%r3, 4
 	beq		sys8_config_patchsfo
-
 	b syscall8_unsupported
 
-sys8_config_retailxml:
+sys8_config_retailxml: //NOT WORKING.
 	b syscall8_unsupported
-sys8_config_debugxml:
+sys8_config_debugxml: //NOT WORKING.
 	b syscall8_unsupported
 sys8_config_freeredirect:
-//	b syscall8_unsupported
-    mflr    %r0
-	stdu    %sp, -0xA0(%sp)
-	std     %r0, 0xB0(%sp)
-    std      %r27, 0x78(%sp)
-    std      %r31, 0x98(%sp)
-
-    MEM_BASE(%r31)
-
+	mflr	%r0
+	stdu	%sp, -0xA0(%sp)
+	std		%r0, 0xB0(%sp)
+	std		%r27, 0x78(%sp)
+	std		%r31, 0x98(%sp)
+	MEM_BASE(%r31)
 	// free device memory
-    LOAD_LABEL2(%r27, %r31, buffer)
-	ld      %r3, 0(%r27)
-	cmpldi   %r3, 0
-	beq     sys8_config_freeredirect2
-	li      %r4, 0x27
-	bl      ABS(free)
-
-    li      %r3, 0
-    std     %r3, 0(%r27)
-    std     %r3, 8(%r27)
+	LOAD_LABEL2(%r27, %r31, buffer)
+	ld		%r3, 0(%r27)
+	cmpldi	%r3, 0
+	beq		sys8_config_freeredirect2
+	li		%r4, 0x27
+	bl		ABS(free)
+	li		%r3, 0
+	std		%r3, 0(%r27)
+	std		%r3, 8(%r27)
 sys8_config_freeredirect2:
-    LOAD_LABEL2(%r27, %r31, buffer2)
-	ld	    %r3, 0x0(%r27)
-    cmpldi   %r3, 0
-	beq     sys8_config_freeredirect3
-	li      %r4, 0x27
-	bl      ABS(free)
-    li      %r3, 0
-    std     %r3, 0(%r27)
+	LOAD_LABEL2(%r27, %r31, buffer2)
+	ld		%r3, 0x0(%r27)
+	cmpldi	%r3, 0
+	beq		sys8_config_freeredirect3
+	li		%r4, 0x27
+	bl		ABS(free)
+	li		%r3, 0
+	std		%r3, 0(%r27)
 sys8_config_freeredirect3:
-    LOAD_LABEL2(%r27, %r31, str_open_cmp)
-    std     %r3, 0(%r27)
-    ld      %r27, 0x78(%sp)
-    ld      %r31, 0x98(%sp)
-    ld	    %r0, 0xB0(%sp)
-    addi    %sp, %sp, 0xA0
-	mtlr    %r0
+	LOAD_LABEL2(%r27, %r31, str_open_cmp)
+	std		%r3, 0(%r27)
+	ld		%r27, 0x78(%sp)
+	ld		%r31, 0x98(%sp)
+	ld		%r0, 0xB0(%sp)
+	addi	%sp, %sp, 0xA0
+	mtlr	%r0
 	blr    
-sys8_config_unpatchsfo:
+sys8_config_unpatchsfo: //NOT WORKING.
 	b syscall8_unsupported
-sys8_config_patchsfo:
+sys8_config_patchsfo: //NOT WORKING.
 	b syscall8_unsupported
 
 /**
@@ -506,8 +508,8 @@ buffer2:
 	.quad 0
 str_open_cmp:
 	.quad 0
-save_syscall_values: // (for stealth)
-	.quad 0 // stealth mode
-	.quad 0 // key
-	.quad 0 // syscall 6
-	.quad 0 // syscall 7
+save_syscall_values:
+	.quad 0 //Stealth Mode.
+	.quad 0 //Key.
+	.quad 0 //Syscall 6.
+	.quad 0 //Syscall 7.
