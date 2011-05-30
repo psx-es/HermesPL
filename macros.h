@@ -6,6 +6,10 @@
     li dest, 1; \
     rldicr dest, dest, 63, 0;
 
+#define LOAD_ABS(dest, source, address)  \
+	oris	dest, source, ((address))@h; \
+	ori		dest, dest, ((address))@l;
+
 #define LOAD_LABEL(base, dest, source, address) \
     oris    dest, source, ((base) + (address))@h; \
     ori    dest, dest, ((base) + (address))@l;

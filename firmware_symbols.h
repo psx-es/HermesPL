@@ -4,6 +4,8 @@
 
 	#define BASE						0xef48
 
+	#define syscall_table				0x346570
+
 	#define strncmp						0x4e6d8
 	#define strcpy						0x4e684
 	#define strlen						0x4e6ac
@@ -21,6 +23,8 @@
 #elif defined(FW_341)
 
 	#define BASE						0x50b3c
+
+	#define syscall_table				0x2eb128
 
 	#define strncmp						0x4d344
 	#define strcpy						0x4d2f0

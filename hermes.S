@@ -283,10 +283,32 @@ syscall8_bl:
 	bctr
 
 /**
-	Syscall 8 Disable -> NOT WORKING
+	Syscall 8 Disable
+		system_call_2(8, 0, key)
 */
 sys8_disable:
-	b syscall8_unsupported
+	LOAD_LABEL2(%r27, %r31, save_syscall_values)
+	std		%r3,  8(%r27) // save key
+
+	li		%r28, 1
+	stw		%r28, 0(%r27) // stealth mode
+
+	LOAD_ABS(%r4, %r31, syscall_table)
+
+	ld		%r3, 37*8(%r4) // get unused syscall addr
+
+	ld		%r28, 6*8(%r4)
+	std		%r3,  6*8(%r4) // patch syscall 6 to stealth
+	std		%r28,  16(%r27)
+
+	ld		%r28, 7*8(%r4)
+	std		%r3,  7*8(%r4) // patch syscall 7 to stealth
+	std		%r28,  24(%r27)
+
+	std		%r3, 36*8(%r4) // patch syscall 36 to stealth
+
+	li		%r3, 0
+	blr
 
 /**
 	Syscall 8 Enable
@@ -342,6 +364,7 @@ sys8_panic:
 	li		%r3, 0
 	li		%r11, 0xFF
 	sc		1
+	blr
 
 /**
 	Syscall 8 Perm Mode -> NOT WORKING
@@ -363,6 +386,7 @@ sys8_open_table:
 
 /**
 	Syscall 8 Config -> NOT WORKING
+		system_call_1(8, 10, mode)
 */
 sys8_config:
 	b syscall8_unsupported
@@ -422,3 +446,8 @@ buffer:
 	.quad 0
 str_open_cmp:
 	.quad 0
+save_syscall_values: // (for stealth)
+	.quad 0 // stealth mode
+	.quad 0 // key
+	.quad 0 // syscall 6
+	.quad 0 // syscall 7
