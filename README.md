@@ -25,12 +25,21 @@ Firmwares
 Firmware 3.55
 -------------
 ef48: hermes_3_55.bin # Payload
+
 55f14: 60000000 # Syscall 36 Patches
+
 55f1c: 48000098 # Syscall 36 Patches
+
 7af68: 60000000 # Syscall 36 Patches
+
 7af7c: 60000000 # Syscall 36 Patches
+
 55ea4: 60000000 # Fix 8001003D error
+
 55f68: 3be00000 # Fix 8001003E error
+
 2b3298: 4bd5bcd0 # Jump Hook
+
 3465b0: 800000000000ef58 # syscall_8_desc - sys8
+
 346690: 800000000000ef60 # syscall_map_open_desc - sys36
