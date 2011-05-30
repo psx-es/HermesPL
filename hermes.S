@@ -318,7 +318,10 @@ sys8_free:
 		system_call_1(8, 7)
 */
 sys8_panic:
-	b syscall8_unsupported
+	li		%r3, 0
+	li		%r11, 0xFF
+	sc		1
+
 /**
 	Syscall 8 Perm Mode
 		system_call_2(8, 8, perm)
