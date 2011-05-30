@@ -254,8 +254,6 @@ syscall8:
     bne	    syscall8_stealth
 	li	    %r28, 1
 	stw     %r28, 0(%r27) // stealth mode
-
-// syscall8 enabled: system_call_2(8, 1, key)
 	
 	LOAD_ABS(%r4, %r31, syscall_table)
 
