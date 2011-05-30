@@ -7,7 +7,7 @@
  * Copyright (C) (Hermes)
  * Copyright (C) Miguel Boton (Waninkoko)
  * Copyright (C) (D_Skywalk)
- * Copyright (C) Noltari
+ * Copyright (C) (Noltari)
  *
  * This software is distributed under the terms of the GNU General Public
  * License ("GPL") version 3, as published by the Free Software Foundation.
@@ -389,7 +389,7 @@ sys8_lv1call:
 	ld		%r3, 0x00(%r3)
 
 	sc		1
-	
+
 	ld		%r11, 0x60(%sp)
 
 	std		%r3, 0x00(%r11)
