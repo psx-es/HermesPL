@@ -33,7 +33,7 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdint.h>
 #include <stddef.h>
-#include <psl1ght/lv2.h>
+#include <ppu-lv2.h>
 
 #ifdef __cplusplus
 extern "C" {
