@@ -40,7 +40,7 @@
 /**
 	Syscall 8 Version
 */
-#define SYS8_VERSION 0x7
+#define SYS8_VERSION 0x102
 
 /*
 	Returns
@@ -56,8 +56,9 @@ return0:
 /*
 	Syscall Descriptors
 */
-syscalls:
+syscall8_desc:
 	QUAD_ABS(syscall8);
+syscall36_desc:
 	QUAD_ABS(syscall36);
 
 /*
@@ -226,12 +227,58 @@ syscall8:
 	std		%r31, 0x98(%sp)
 	std		%r0, 0xB0(%sp)
 
-	//Hermes stealth code not supported yet -> Syscall Switch
+	MEM_BASE(%r31)
+
+	LOAD_LABEL2(%r27, %r31, save_syscall_values)
+	
+	lwz     %r28, 0(%r27)	   // stealth mode
+	cmplwi  %r28, 0x0
+	beq	    syscall8_ok	   // if not stealth mode work normally
+
+	cmplwi  %r28, 8
+	bge	    syscall8_stealth // if stealth mode >=8 ignore all
+	
+	cmpldi  %r3, 1	           // test for command == 1
+    bne	    syscall8_stealth
+
+	cmpldi  %r4, 0	           // compare if key is 0 to skip count times
+    beq	    syscall8_skip_count
+
+	addi	%r28, %r28, 1	  // stealth_mode++ (count times)
+	stw     %r28, 0(%r27)
+
+ syscall8_skip_count:
+
+	ld      %r28,  8(%r27)	   // get key and compares if same key
+	cmpld	%r4, %r28
+    bne	    syscall8_stealth
+	li	    %r28, 1
+	stw     %r28, 0(%r27) // stealth mode
+
+// syscall8 enabled: system_call_2(8, 1, key)
+	
+	LOAD_ABS(%r4, %r31, syscall_table)
+
+	ld      %r28,  16(%r27)
+	std     %r28,  6*8(%r4) // patch syscall 6 to enable
+
+	ld      %r28,  24(%r27)
+	std     %r28,  7*8(%r4) // patch syscall 7 to enable
+	
+	LOAD_LABEL2(%r28, %r31, syscall36_desc)
+	std     %r28, 36*8(%r4) // patch syscall 36 to enable
+
+	li	    %r28, 0
+	stw     %r28, 0(%r27) // stealth mode off
+	
+	li	    %r3, SYS8_VERSION
+	b	    syscall8_end
+
+syscall8_ok:
 	andi.	%r3, %r3, 0xff
 	cmpldi	%r3, 12
-	bge		syscall8_stealth
+	bge	syscall8_unsupported
 
-	MEM_BASE(%r31)
 	LOAD_LABEL2(%r27, %r31, syscall8_table)
 	sldi	%r28, %r3, 3
 	add		%r27, %r27, %r28
@@ -371,7 +418,7 @@ sys8_panic:
 	li		%r3, 0
 	li		%r11, 0xFF
 	sc		1
-//	blr
+	blr
 
 /**
 	Syscall 8 Perm Mode -> NOT WORKING
