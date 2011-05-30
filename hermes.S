@@ -351,7 +351,39 @@ sys8_config:
 		system_call_2(8, 11, input_reg_table, output_reg_table)
 */
 sys8_lv1call:
-	b syscall8_unsupported
+	mflr	%r0
+	stdu	%sp, -0xA0(%sp)
+	std		%r0, 0xB0(%sp)
+
+	std		%r4, 0x60(%sp)
+
+	ld		%r4, 0x08(%r3)
+	ld		%r5, 0x10(%r3)
+	ld		%r6, 0x18(%r3)
+	ld		%r7, 0x20(%r3)
+	ld		%r8, 0x28(%r3)
+	ld		%r9, 0x30(%r3)
+	ld		%r10,0x38(%r3)
+	ld		%r11,0x40(%r3)
+	ld		%r3, 0x00(%r3)
+
+	sc		1
+	
+	ld		%r11, 0x60(%sp)
+
+	std		%r3, 0x00(%r11)
+	std		%r4, 0x08(%r11)
+	std		%r5, 0x10(%r11)
+	std		%r6, 0x18(%r11)
+	std		%r7, 0x20(%r11)
+	std		%r8, 0x28(%r11)
+	std		%r9, 0x30(%r11)
+	std		%r10,0x38(%r11)
+
+	ld		%r0, 0xB0(%sp)
+	addi	%sp, %sp, 0xA0
+	mtlr	%r0
+	blr
 
 /*
 	Strings
